@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NousUI Lab · Librería gráfica personalizada</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="panel header">
+      <div>
+        <h1>NousUI Lab</h1>
+        <p>Librería personalizada de interfaces + demo funcional con persistencia en IndexedDB.</p>
+      </div>
+      <div class="actions">
+        <button id="openModalBtn">Nuevo componente</button>
+        <button id="resetDbBtn" class="secondary">Reset BD</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="row">
+        <label>Filtro por estado
+          <select id="statusFilter" data-nous="searchable">
+            <option value="all">Todos</option>
+            <option value="draft">Borrador</option>
+            <option value="testing">En pruebas</option>
+            <option value="ready">Listo</option>
+            <option value="deprecated">Deprecated</option>
+          </select>
+        </label>
+        <label>Búsqueda por nombre
+          <input id="searchInput" placeholder="Ej: Input con validación async">
+        </label>
+      </div>
+      <div class="stats" id="statsBox"></div>
+    </section>
+
+    <section class="panel">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Notas</th>
+              <th>Creado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="componentsTable"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty" hidden>No hay componentes todavía.</div>
+    </section>
+
+    <section class="grid">
+      <nous-card>
+        <span slot="title">Playground de badges</span>
+        <p>Componente web personalizado de la librería.</p>
+        <div class="actions">
+          <nous-badge tone="neutral">neutral</nous-badge>
+          <nous-badge tone="success">success</nous-badge>
+          <nous-badge tone="warning">warning</nous-badge>
+          <nous-badge tone="danger">danger</nous-badge>
+        </div>
+      </nous-card>
+
+      <nous-card>
+        <span slot="title">Tema de la librería</span>
+        <label>Color de acento
+          <input id="accentInput" type="color" value="#2f3437">
+        </label>
+        <label>Color de fondo
+          <input id="bgInput" type="color" value="#f6f6f4">
+        </label>
+        <button id="saveThemeBtn" class="secondary">Guardar tema</button>
+      </nous-card>
+    </section>
+  </main>
+
+  <nous-modal id="componentModal">
+    <span slot="title">Nuevo componente de interfaz</span>
+    <form id="componentForm">
+      <label>Nombre
+        <input id="compName" required maxlength="100" placeholder="Botón de pago con estado loading">
+      </label>
+      <label>Tipo
+        <select id="compType" required>
+          <option value="button">Button</option>
+          <option value="input">Input</option>
+          <option value="select">Select</option>
+          <option value="card">Card</option>
+          <option value="modal">Modal</option>
+          <option value="table">Table</option>
+        </select>
+      </label>
+      <label>Estado
+        <select id="compStatus" required>
+          <option value="draft">Borrador</option>
+          <option value="testing">En pruebas</option>
+          <option value="ready">Listo</option>
+          <option value="deprecated">Deprecated</option>
+        </select>
+      </label>
+      <label>Notas funcionales
+        <textarea id="compNotes" rows="4" placeholder="Describe la lógica, eventos, validaciones o persistencia asociada..."></textarea>
+      </label>
+      <div class="actions">
+        <button type="submit">Guardar componente</button>
+      </div>
+    </form>
+  </nous-modal>
+
+  <nous-toast id="toast"></nous-toast>
+
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>
