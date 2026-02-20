@@ -21,14 +21,14 @@ NousUI Lab es un **design system completo** construido desde cero con **Custom E
 
 ## Componentes de la librería
 
-| Tag | Descripción | Shadow DOM |
-|-----|-------------|:----------:|
-| `<nous-card>` | Tarjeta con barra de acento, hover y slots | ✅ |
-| `<nous-badge>` | Indicador inline con 6 tonos cromáticos | ✅ |
-| `<nous-modal>` | Diálogo con backdrop blur, ESC y slideUp | ✅ |
-| `<nous-toast>` | Notificación efímera con iconos por tono | ✅ |
-| `<nous-progress>` | Barra de progreso con ARIA y 5 tonos | ✅ |
-| `<nous-tooltip>` | Tooltip flotante con flecha CSS | ✅ |
+| Tag               | Descripción                                | Shadow DOM |
+| ----------------- | ------------------------------------------ | :--------: |
+| `<nous-card>`     | Tarjeta con barra de acento, hover y slots |     ✅     |
+| `<nous-badge>`    | Indicador inline con 6 tonos cromáticos    |     ✅     |
+| `<nous-modal>`    | Diálogo con backdrop blur, ESC y slideUp   |     ✅     |
+| `<nous-toast>`    | Notificación efímera con iconos por tono   |     ✅     |
+| `<nous-progress>` | Barra de progreso con ARIA y 5 tonos       |     ✅     |
+| `<nous-tooltip>`  | Tooltip flotante con flecha CSS            |     ✅     |
 
 Más: **SearchableSelect** (upgrade de `<select>` a buscable con teclado) y **motor de temas** con `applyTheme()` / `loadTheme()`.
 
@@ -47,19 +47,19 @@ NousUI-Lab/
 
 ## Características principales
 
-| Feature | Detalle |
-|---------|---------|
-| **6 Web Components** | Card, Badge, Modal, Toast, Progress, Tooltip — todos con Shadow DOM |
-| **CRUD IndexedDB** | Create, Read, Update (promote), Delete con singleton de conexión |
-| **4 KPIs en tiempo real** | Total, Listos, En pruebas, Borradores |
-| **3 tabs declarativos** | Componentes, Insignias, Tema — con ARIA roles |
-| **Catálogo preview grid** | Demos en vivo de los 6 componentes en grid responsive |
-| **Editor de tema (4 colores)** | Accent, Background, Text, Panel — persistido en localStorage |
-| **Dark mode** | Toggle + `prefers-color-scheme` + `.dark` class |
-| **Confirm personalizado** | `nousConfirm()` → Promise, overlay blur, ESC |
-| **Export JSON** | Descarga todos los componentes como archivo `.json` |
-| **SearchableSelect** | Filtra opciones en tiempo real con navegación por teclado |
-| **Responsive** | Breakpoints a 960px y 600px, mobile-first |
+| Feature                        | Detalle                                                             |
+| ------------------------------ | ------------------------------------------------------------------- |
+| **6 Web Components**           | Card, Badge, Modal, Toast, Progress, Tooltip — todos con Shadow DOM |
+| **CRUD IndexedDB**             | Create, Read, Update (promote), Delete con singleton de conexión    |
+| **4 KPIs en tiempo real**      | Total, Listos, En pruebas, Borradores                               |
+| **3 tabs declarativos**        | Componentes, Insignias, Tema — con ARIA roles                       |
+| **Catálogo preview grid**      | Demos en vivo de los 6 componentes en grid responsive               |
+| **Editor de tema (4 colores)** | Accent, Background, Text, Panel — persistido en localStorage        |
+| **Dark mode**                  | Toggle + `prefers-color-scheme` + `.dark` class                     |
+| **Confirm personalizado**      | `nousConfirm()` → Promise, overlay blur, ESC                        |
+| **Export JSON**                | Descarga todos los componentes como archivo `.json`                 |
+| **SearchableSelect**           | Filtra opciones en tiempo real con navegación por teclado           |
+| **Responsive**                 | Breakpoints a 960px y 600px, mobile-first                           |
 
 ## Ejecución rápida
 
@@ -79,9 +79,9 @@ python3 -m http.server 8000
 
 ```html
 <script type="module">
-  import { initNousUI, applyTheme } from './lib/nousui.js';
+  import { initNousUI, applyTheme } from "./lib/nousui.js";
   initNousUI();
-  applyTheme({ accent: '#e63946', bg: '#f1faee' });
+  applyTheme({ accent: "#e63946", bg: "#f1faee" });
 </script>
 
 <nous-card accent="#e63946">
@@ -93,16 +93,16 @@ python3 -m http.server 8000
 
 ## Tecnologías
 
-| Stack | Uso |
-|-------|-----|
-| Custom Elements v1 | Definición de los 6 componentes |
-| Shadow DOM | Encapsulación de estilos |
-| CSS Custom Properties | Tokens de diseño dinámicos |
-| IndexedDB | Persistencia local CRUD |
-| ES Modules | Organización modular |
-| localStorage | Tema + preferencia dark |
-| Google Fonts (Inter) | Tipografía del design system |
-| ARIA roles | Accesibilidad (tabs, progressbar, modal) |
+| Stack                 | Uso                                      |
+| --------------------- | ---------------------------------------- |
+| Custom Elements v1    | Definición de los 6 componentes          |
+| Shadow DOM            | Encapsulación de estilos                 |
+| CSS Custom Properties | Tokens de diseño dinámicos               |
+| IndexedDB             | Persistencia local CRUD                  |
+| ES Modules            | Organización modular                     |
+| localStorage          | Tema + preferencia dark                  |
+| Google Fonts (Inter)  | Tipografía del design system             |
+| ARIA roles            | Accesibilidad (tabs, progressbar, modal) |
 
 ## Autor
 

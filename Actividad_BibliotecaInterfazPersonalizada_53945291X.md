@@ -1,13 +1,11 @@
 # Actividad: Biblioteca de interfaz personalizada con Custom Elements y Shadow DOM
 
-| Campo              | Valor                                          |
-|--------------------|------------------------------------------------|
-| **Alumno**         | Luis Adolfo Roces Dávila — 53945291X           |
-| **Ciclo**          | DAM2 — Desarrollo de Aplicaciones Multiplataforma |
-| **Módulo**         | Desarrollo de Interfaces                       |
-| **Proyecto**       | NousUI Lab                                     |
-| **Repositorio**    | <https://github.com/luisrocedev/NousUI-Lab>    |
-| **Fecha de entrega** | 2025                                         |
+| Campo        | Valor                                             |
+| ------------ | ------------------------------------------------- |
+| **Alumno**   | Luis Jahir Rodriguez Cedeño — 53945291X           |
+| **Ciclo**    | DAM2 — Desarrollo de Aplicaciones Multiplataforma |
+| **Módulo**   | Desarrollo de Interfaces                          |
+| **Proyecto** | NousUI Lab                                        |
 
 ---
 
@@ -65,6 +63,7 @@ Tarjeta contenedora con **Shadow DOM**, barra de acento configurable (`accent`),
 ```
 
 **Características:**
+
 - Atributo `accent` inyecta estilo `::before` con color de barra superior.
 - `observedAttributes` permite reactividad al cambiar el acento dinámicamente.
 - Hover: `translateY(-3px)` + sombra `0 8px 20px`.
@@ -78,6 +77,7 @@ Indicador visual inline con **6 tonos cromáticos**: `neutral`, `success`, `warn
 ```
 
 **Características:**
+
 - Punto indicador `::before` (dot) con color correspondiente al tono.
 - Paleta mapeada internamente: cada tono asigna `background`, `color` y `dotColor`.
 - Shadow DOM con fuente heredada vía `:host`.
@@ -94,6 +94,7 @@ Diálogo modal con backdrop blur, animación `slideUp`, cierre por clic en overl
 ```
 
 **API programática:**
+
 - `.open()` — Muestra el modal, bloquea `body` con `overflow: hidden`.
 - `.close()` — Oculta el modal, restaura el overflow del body.
 - Listener `keydown Escape` se registra al abrir y se elimina al cerrar (sin memory leaks).
@@ -103,10 +104,11 @@ Diálogo modal con backdrop blur, animación `slideUp`, cierre por clic en overl
 Notificación efímera con 4 tonos (`success`, `danger`, `warning`, `info`, `accent`) e iconos automáticos SVG.
 
 ```js
-document.getElementById('toast').show('Guardado correctamente', 'success');
+document.getElementById("toast").show("Guardado correctamente", "success");
 ```
 
 **Características:**
+
 - Paleta: fondo, color de texto e icono SVG por tono.
 - Animación `fadeIn 0.3s` + `fadeOut 0.3s` antes de ocultar.
 - Duración configurable (default 2800 ms).
@@ -120,6 +122,7 @@ Barra de progreso con valor numérico (0-100), 5 tonos (`success`, `warning`, `d
 ```
 
 **Características:**
+
 - Valor renderizado como texto porcentual superpuesto.
 - Animación de anchura con `transition: width 0.5s ease`.
 - Atributos ARIA: `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`.
@@ -135,6 +138,7 @@ Tooltip flotante con flecha CSS que aparece al hacer hover sobre el elemento hij
 ```
 
 **Características:**
+
 - Posicionamiento absoluto encima del slot con `bottom: 120%`.
 - Flecha CSS generada con `::after` (triángulo invertido).
 - Transición `opacity 0.2s` + `transform translateY(-4px)`.
@@ -144,6 +148,7 @@ Tooltip flotante con flecha CSS que aparece al hacer hover sobre el elemento hij
 Clase utilitaria que reemplaza `<select data-nous="searchable">` por un input con panel desplegable de búsqueda en tiempo real.
 
 **Características:**
+
 - Filtra opciones por `includes()` (case-insensitive).
 - Navegación por teclado: `ArrowUp`, `ArrowDown`, `Enter`, `Escape`.
 - Cierre al hacer clic fuera (`document.click`).
@@ -155,12 +160,12 @@ Clase utilitaria que reemplaza `<select data-nous="searchable">` por un input co
 
 ### 4.1 Design tokens (CSS Custom Properties)
 
-| Token       | Default (light) | Descripción              |
-|-------------|-----------------|--------------------------|
-| `--accent`  | `#2a85ff`       | Color de énfasis/acento  |
-| `--bg`      | `#f7f7f5`       | Fondo general            |
-| `--text`    | `#1e1e1e`       | Color de texto principal  |
-| `--panel`   | `#ffffff`       | Fondo de paneles/cards   |
+| Token      | Default (light) | Descripción              |
+| ---------- | --------------- | ------------------------ |
+| `--accent` | `#2a85ff`       | Color de énfasis/acento  |
+| `--bg`     | `#f7f7f5`       | Fondo general            |
+| `--text`   | `#1e1e1e`       | Color de texto principal |
+| `--panel`  | `#ffffff`       | Fondo de paneles/cards   |
 
 ### 4.2 Funciones de tema
 
@@ -184,32 +189,32 @@ Clase utilitaria que reemplaza `<select data-nous="searchable">` por un input co
 
 3 tabs declarativos con ARIA roles (`tablist`, `tab`, `aria-selected`):
 
-| Tab           | Contenido                                                |
-|---------------|----------------------------------------------------------|
-| Componentes   | KPIs, filtros, tabla CRUD, catálogo preview grid         |
-| Insignias     | Catálogo de 6 tonos de badge, progress, tooltip          |
-| Tema          | Editor de 4 colores, guardar/resetear, info de tokens    |
+| Tab         | Contenido                                             |
+| ----------- | ----------------------------------------------------- |
+| Componentes | KPIs, filtros, tabla CRUD, catálogo preview grid      |
+| Insignias   | Catálogo de 6 tonos de badge, progress, tooltip       |
+| Tema        | Editor de 4 colores, guardar/resetear, info de tokens |
 
 ### 5.2 KPIs
 
 4 indicadores en tiempo real:
 
-| KPI         | Color       | Fuente                         |
-|-------------|-------------|--------------------------------|
-| Total       | `--accent`  | `rows.length`                  |
-| Listos      | `#22c55e`   | `status === 'ready'`           |
-| En pruebas  | `#3b82f6`   | `status === 'testing'`         |
-| Borradores  | `#f59e0b`   | `status === 'draft'`           |
+| KPI        | Color      | Fuente                 |
+| ---------- | ---------- | ---------------------- |
+| Total      | `--accent` | `rows.length`          |
+| Listos     | `#22c55e`  | `status === 'ready'`   |
+| En pruebas | `#3b82f6`  | `status === 'testing'` |
+| Borradores | `#f59e0b`  | `status === 'draft'`   |
 
 ### 5.3 CRUD con IndexedDB
 
-| Operación | Función       | Descripción                              |
-|-----------|---------------|------------------------------------------|
-| Create    | `insertRow()` | Añade componente con timestamp ISO       |
-| Read      | `listAll()`   | Recupera todos los registros             |
-| Update    | `updateRow()` | Promueve estado (draft→testing→ready→deprecated) |
-| Delete    | `deleteRow()` | Elimina tras confirmación personalizada  |
-| Clear     | `clearStore()` | Vacía toda la BD tras confirmación      |
+| Operación | Función        | Descripción                                      |
+| --------- | -------------- | ------------------------------------------------ |
+| Create    | `insertRow()`  | Añade componente con timestamp ISO               |
+| Read      | `listAll()`    | Recupera todos los registros                     |
+| Update    | `updateRow()`  | Promueve estado (draft→testing→ready→deprecated) |
+| Delete    | `deleteRow()`  | Elimina tras confirmación personalizada          |
+| Clear     | `clearStore()` | Vacía toda la BD tras confirmación               |
 
 **Singleton de conexión:** La conexión a IndexedDB se cachea en `_dbCached` para evitar abrir/cerrar la BD en cada operación.
 
@@ -243,36 +248,36 @@ Grid responsive (`auto-fill, minmax(260px, 1fr)`) con demos en vivo de los 6 com
 
 ### 6.2 Componentes CSS principales
 
-| Selector           | Descripción                                         |
-|--------------------|-----------------------------------------------------|
-| `.tabs`            | Barra de navegación con pills activas               |
-| `.kpi-bar`         | Grid de 4 columnas para indicadores                 |
-| `.preview-grid`    | Grid responsive para catálogo de componentes         |
-| `.confirm-overlay` | Overlay con blur + dialog centrado                   |
-| `.footer`          | Pie de página con separador superior                 |
-| `body.dark`        | Override de custom properties para modo oscuro        |
+| Selector           | Descripción                                    |
+| ------------------ | ---------------------------------------------- |
+| `.tabs`            | Barra de navegación con pills activas          |
+| `.kpi-bar`         | Grid de 4 columnas para indicadores            |
+| `.preview-grid`    | Grid responsive para catálogo de componentes   |
+| `.confirm-overlay` | Overlay con blur + dialog centrado             |
+| `.footer`          | Pie de página con separador superior           |
+| `body.dark`        | Override de custom properties para modo oscuro |
 
 ### 6.3 Responsive
 
-| Breakpoint | Cambios                                              |
-|------------|------------------------------------------------------|
-| ≤ 960px    | Preview grid 2 cols, KPIs 2 cols, row 1 col          |
-| ≤ 600px    | Todo 1 col, tabs wrap, header vertical                |
+| Breakpoint | Cambios                                     |
+| ---------- | ------------------------------------------- |
+| ≤ 960px    | Preview grid 2 cols, KPIs 2 cols, row 1 col |
+| ≤ 600px    | Todo 1 col, tabs wrap, header vertical      |
 
 ---
 
 ## 7. Tecnologías utilizadas
 
-| Tecnología               | Uso                                              |
-|--------------------------|--------------------------------------------------|
-| Custom Elements v1       | Definición de los 6 componentes web               |
-| Shadow DOM               | Encapsulación de estilos y markup                 |
-| CSS Custom Properties    | Sistema de diseño con tokens dinámicos            |
-| IndexedDB                | Persistencia local CRUD                           |
-| ES Modules               | Organización modular con import/export            |
-| localStorage             | Persistencia de tema y preferencia dark mode       |
-| Google Fonts (Inter)     | Tipografía del design system                      |
-| ARIA roles               | Accesibilidad en tabs, progress, modal            |
+| Tecnología            | Uso                                          |
+| --------------------- | -------------------------------------------- |
+| Custom Elements v1    | Definición de los 6 componentes web          |
+| Shadow DOM            | Encapsulación de estilos y markup            |
+| CSS Custom Properties | Sistema de diseño con tokens dinámicos       |
+| IndexedDB             | Persistencia local CRUD                      |
+| ES Modules            | Organización modular con import/export       |
+| localStorage          | Persistencia de tema y preferencia dark mode |
+| Google Fonts (Inter)  | Tipografía del design system                 |
+| ARIA roles            | Accesibilidad en tabs, progress, modal       |
 
 ---
 
@@ -297,9 +302,9 @@ python3 -m http.server 8000
 
 ```html
 <script type="module">
-  import { initNousUI, applyTheme } from './lib/nousui.js';
+  import { initNousUI, applyTheme } from "./lib/nousui.js";
   initNousUI();
-  applyTheme({ accent: '#e63946', bg: '#f1faee' });
+  applyTheme({ accent: "#e63946", bg: "#f1faee" });
 </script>
 
 <nous-card accent="#e63946">
@@ -311,57 +316,6 @@ python3 -m http.server 8000
 
 ---
 
-## 9. Capturas de pantalla
-
-> Las capturas se incluyen en la presentación del proyecto.
-
-| Vista               | Descripción                                    |
-|---------------------|------------------------------------------------|
-| Tab Componentes     | KPIs + tabla CRUD + catálogo preview grid       |
-| Tab Insignias       | 6 tonos de badge + progress + tooltip           |
-| Tab Tema            | Editor de 4 colores + modo oscuro               |
-| Modal               | Diálogo con blur y slide-up                     |
-| Confirm             | Overlay personalizado con Promise               |
-| Dark mode           | Interfaz completa en modo oscuro                |
-| Responsive          | Vista mobile ≤ 600px                            |
-
----
-
 ## 10. Conclusiones
 
-NousUI Lab demuestra que es posible construir un **design system completo** utilizando exclusivamente APIs nativas del navegador. Los 6 Web Components con Shadow DOM garantizan encapsulación real, el sistema de temas con CSS Custom Properties permite personalización dinámica, e IndexedDB proporciona persistencia robusta sin backend.
-
-La SPA de demostración integra todas las piezas en una experiencia cohesiva con tabs declarativos, KPIs en tiempo real, catálogo interactivo, exportación de datos y un editor visual de tema con dark mode — todo ello sin ninguna dependencia externa.
-
----
-
-## Anexo A — Custom Elements registrados
-
-| Tag                | Clase              | Shadow DOM | Slots          |
-|--------------------|--------------------|------------|----------------|
-| `<nous-card>`      | `NousCard`         | ✅          | title, default |
-| `<nous-badge>`     | `NousBadge`        | ✅          | default        |
-| `<nous-modal>`     | `NousModal`        | ✅          | title, default |
-| `<nous-toast>`     | `NousToast`        | ✅          | —              |
-| `<nous-progress>`  | `NousProgress`     | ✅          | —              |
-| `<nous-tooltip>`   | `NousTooltip`      | ✅          | default        |
-
-## Anexo B — Schema IndexedDB
-
-```
-Database: nousui_lab_db (v1)
-└── ObjectStore: components
-    ├── keyPath: id (autoIncrement)
-    ├── Index: status
-    ├── Index: createdAt
-    └── Fields: name, type, status, notes, createdAt
-```
-
-## Anexo C — Funciones exportadas de `nousui.js`
-
-| Función            | Descripción                                      |
-|--------------------|--------------------------------------------------|
-| `initNousUI()`     | Registra los 6 Custom Elements                   |
-| `applyTheme(obj)`  | Aplica y persiste un objeto de tema               |
-| `loadTheme()`      | Recupera el tema guardado en localStorage         |
-| `SearchableSelect` | Clase para upgrade de `<select>` a buscable       |
+NousUI Lab demuestra que es posible construir un **design system completo** utilizando exclusivamente APIs nativas del navegador. Los 6 Web Components con Shadow DOM garantizan encapsulación real, el sistema de temas con CSS Custom Properties permite personalización dinámica, e IndexedDB proporciona persistencia robusta sin backend.X
