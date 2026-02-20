@@ -1,148 +1,193 @@
+/**
+ * NousUI Lab — app.js v2
+ * SPA con IndexedDB CRUD, tabs declarativos, 4 KPIs, confirmación
+ * personalizada, exportación JSON, dark mode y tema de 4 colores.
+ */
 import { applyTheme, initNousUI, loadTheme } from '../lib/nousui.js';
 
-const DB_NAME = 'nousui_lab_db';
+/* ─── Config ────────────────────────────────────────────────── */
+const DB_NAME    = 'nousui_lab_db';
 const DB_VERSION = 1;
-const STORE = 'components';
+const STORE      = 'components';
 
+/* ─── DOM refs ──────────────────────────────────────────────── */
 const el = {
-  openModalBtn: document.getElementById('openModalBtn'),
-  resetDbBtn: document.getElementById('resetDbBtn'),
-  statusFilter: document.getElementById('statusFilter'),
-  searchInput: document.getElementById('searchInput'),
+  openModalBtn   : document.getElementById('openModalBtn'),
+  exportBtn      : document.getElementById('exportBtn'),
+  resetDbBtn     : document.getElementById('resetDbBtn'),
+  statusFilter   : document.getElementById('statusFilter'),
+  searchInput    : document.getElementById('searchInput'),
   componentsTable: document.getElementById('componentsTable'),
-  emptyState: document.getElementById('emptyState'),
-  componentModal: document.getElementById('componentModal'),
-  componentForm: document.getElementById('componentForm'),
-  compName: document.getElementById('compName'),
-  compType: document.getElementById('compType'),
-  compStatus: document.getElementById('compStatus'),
-  compNotes: document.getElementById('compNotes'),
-  statsBox: document.getElementById('statsBox'),
-  toast: document.getElementById('toast'),
-  accentInput: document.getElementById('accentInput'),
-  bgInput: document.getElementById('bgInput'),
-  saveThemeBtn: document.getElementById('saveThemeBtn'),
+  emptyState     : document.getElementById('emptyState'),
+  componentModal : document.getElementById('componentModal'),
+  demoModal      : document.getElementById('demoModal'),
+  componentForm  : document.getElementById('componentForm'),
+  compName       : document.getElementById('compName'),
+  compType       : document.getElementById('compType'),
+  compStatus     : document.getElementById('compStatus'),
+  compNotes      : document.getElementById('compNotes'),
+  toast          : document.getElementById('toast'),
+  /* KPIs */
+  kpiTotal       : document.getElementById('kpiTotal'),
+  kpiReady       : document.getElementById('kpiReady'),
+  kpiTesting     : document.getElementById('kpiTesting'),
+  kpiDraft       : document.getElementById('kpiDraft'),
+  /* Theme */
+  accentInput    : document.getElementById('accentInput'),
+  bgInput        : document.getElementById('bgInput'),
+  textInput      : document.getElementById('textInput'),
+  panelInput     : document.getElementById('panelInput'),
+  saveThemeBtn   : document.getElementById('saveThemeBtn'),
+  resetThemeBtn  : document.getElementById('resetThemeBtn'),
+  darkModeBtn    : document.getElementById('darkModeBtn'),
+  /* Confirm overlay */
+  confirmOverlay : document.getElementById('confirmOverlay'),
+  confirmTitle   : document.getElementById('confirmTitle'),
+  confirmMsg     : document.getElementById('confirmMsg'),
+  confirmYes     : document.getElementById('confirmYes'),
+  confirmNo      : document.getElementById('confirmNo'),
+  /* Demo */
+  demoModalBtn   : document.getElementById('demoModalBtn'),
+  demoToastBtn   : document.getElementById('demoToastBtn'),
 };
 
-const state = {
-  rows: [],
-  filterStatus: 'all',
-  search: '',
-};
+/* ─── State ─────────────────────────────────────────────────── */
+const state = { rows: [], filterStatus: 'all', search: '' };
+
+/* ═══════════════════════════════════════════════════════════════
+   IndexedDB — Singleton con caché de conexión
+   ═══════════════════════════════════════════════════════════════ */
+let _dbCached = null;
 
 function openDb() {
+  if (_dbCached) return Promise.resolve(_dbCached);
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onerror = () => reject(request.error);
-
-    request.onupgradeneeded = () => {
-      const db = request.result;
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onerror = () => reject(req.error);
+    req.onupgradeneeded = () => {
+      const db = req.result;
       if (!db.objectStoreNames.contains(STORE)) {
-        const store = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
-        store.createIndex('status', 'status', { unique: false });
-        store.createIndex('createdAt', 'createdAt', { unique: false });
+        const s = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+        s.createIndex('status', 'status', { unique: false });
+        s.createIndex('createdAt', 'createdAt', { unique: false });
       }
     };
-
-    request.onsuccess = () => resolve(request.result);
+    req.onsuccess = () => { _dbCached = req.result; resolve(_dbCached); };
   });
 }
 
-async function dbAction(mode, callback) {
+async function dbAction(mode, fn) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, mode);
     const store = tx.objectStore(STORE);
-    const request = callback(store);
-
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    tx.oncomplete = () => db.close();
+    const req = fn(store);
+    req.onerror  = () => reject(req.error);
+    req.onsuccess = () => resolve(req.result);
   });
 }
 
-function listAll() {
-  return dbAction('readonly', (store) => store.getAll());
-}
+const listAll    = ()  => dbAction('readonly',  s => s.getAll());
+const insertRow  = (p) => dbAction('readwrite', s => s.add(p));
+const updateRow  = (p) => dbAction('readwrite', s => s.put(p));
+const deleteRow  = (id) => dbAction('readwrite', s => s.delete(id));
+const clearStore = ()  => dbAction('readwrite', s => s.clear());
 
-function insertRow(payload) {
-  return dbAction('readwrite', (store) => store.add(payload));
-}
-
-function updateRow(payload) {
-  return dbAction('readwrite', (store) => store.put(payload));
-}
-
-function deleteRow(id) {
-  return dbAction('readwrite', (store) => store.delete(id));
-}
-
-function clearStore() {
-  return dbAction('readwrite', (store) => store.clear());
-}
-
-function showToast(message) {
-  el.toast.show(message);
-}
+/* ═══════════════════════════════════════════════════════════════
+   Utilidades
+   ═══════════════════════════════════════════════════════════════ */
+function showToast(msg, tone = 'success') { el.toast.show(msg, tone); }
 
 function formatDate(iso) {
-  try {
-    return new Date(iso).toLocaleString('es-ES');
-  } catch {
-    return iso;
-  }
+  try { return new Date(iso).toLocaleString('es-ES'); }
+  catch { return iso; }
 }
+
+function escapeHtml(v) {
+  return String(v)
+    .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;').replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+/* ─── Confirm personalizado (Promise) ──────────────────────── */
+function nousConfirm(msg, title = 'Confirmación') {
+  return new Promise(resolve => {
+    el.confirmTitle.textContent = title;
+    el.confirmMsg.textContent   = msg;
+    el.confirmOverlay.hidden    = false;
+
+    function cleanup(val) {
+      el.confirmOverlay.hidden = true;
+      el.confirmYes.removeEventListener('click', onYes);
+      el.confirmNo.removeEventListener('click', onNo);
+      document.removeEventListener('keydown', onKey);
+      resolve(val);
+    }
+    const onYes = () => cleanup(true);
+    const onNo  = () => cleanup(false);
+    const onKey = (e) => { if (e.key === 'Escape') cleanup(false); };
+    el.confirmYes.addEventListener('click', onYes);
+    el.confirmNo.addEventListener('click', onNo);
+    document.addEventListener('keydown', onKey);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Tabs declarativos
+   ═══════════════════════════════════════════════════════════════ */
+function initTabs() {
+  const tabs     = document.querySelectorAll('.tab[data-tab]');
+  const contents = document.querySelectorAll('.tab-content');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      contents.forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      const target = document.getElementById(`tab-${btn.dataset.tab}`);
+      if (target) target.classList.add('active');
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Rendering
+   ═══════════════════════════════════════════════════════════════ */
+const TONES = { draft: 'warning', testing: 'info', ready: 'success', deprecated: 'danger' };
+const LABELS = { draft: 'Borrador', testing: 'En pruebas', ready: 'Listo', deprecated: 'Deprecated' };
 
 function statusBadge(status) {
-  const toneByStatus = {
-    draft: 'warning',
-    testing: 'neutral',
-    ready: 'success',
-    deprecated: 'danger',
-  };
-  const labelByStatus = {
-    draft: 'Borrador',
-    testing: 'En pruebas',
-    ready: 'Listo',
-    deprecated: 'Deprecated',
-  };
-  const tone = toneByStatus[status] || 'neutral';
-  const label = labelByStatus[status] || status;
-  return `<nous-badge tone="${tone}">${label}</nous-badge>`;
+  const tone  = TONES[status]  || 'neutral';
+  const label = LABELS[status] || status;
+  return `<nous-badge tone="${escapeHtml(tone)}">${escapeHtml(label)}</nous-badge>`;
 }
 
-function renderStats(rows) {
-  const total = rows.length;
-  const ready = rows.filter((row) => row.status === 'ready').length;
-  const testing = rows.filter((row) => row.status === 'testing').length;
-
-  el.statsBox.innerHTML = `
-    <article class="kpi"><strong>${total}</strong><span>Total componentes</span></article>
-    <article class="kpi"><strong>${ready}</strong><span>Listos para uso</span></article>
-    <article class="kpi"><strong>${testing}</strong><span>En pruebas</span></article>
-  `;
+function renderKPIs(rows) {
+  el.kpiTotal.textContent   = rows.length;
+  el.kpiReady.textContent   = rows.filter(r => r.status === 'ready').length;
+  el.kpiTesting.textContent = rows.filter(r => r.status === 'testing').length;
+  el.kpiDraft.textContent   = rows.filter(r => r.status === 'draft').length;
 }
 
 function filteredRows() {
   return state.rows
-    .filter((row) => state.filterStatus === 'all' ? true : row.status === state.filterStatus)
-    .filter((row) => row.name.toLowerCase().includes(state.search.toLowerCase()));
+    .filter(r => state.filterStatus === 'all' || r.status === state.filterStatus)
+    .filter(r => r.name.toLowerCase().includes(state.search.toLowerCase()));
 }
 
 function renderTable() {
   const rows = filteredRows();
-  renderStats(state.rows);
+  renderKPIs(state.rows);
 
   if (!rows.length) {
     el.componentsTable.innerHTML = '';
     el.emptyState.hidden = false;
     return;
   }
-
   el.emptyState.hidden = true;
 
-  el.componentsTable.innerHTML = rows.map((row) => `
+  el.componentsTable.innerHTML = rows.map(row => `
     <tr data-id="${row.id}">
       <td><strong>${escapeHtml(row.name)}</strong></td>
       <td>${escapeHtml(row.type)}</td>
@@ -151,7 +196,7 @@ function renderTable() {
       <td>${formatDate(row.createdAt)}</td>
       <td>
         <div class="actions">
-          <button class="secondary" data-action="promote">Siguiente estado</button>
+          <button class="secondary" data-action="promote">↑ Estado</button>
           <button class="secondary" data-action="delete">Eliminar</button>
         </div>
       </td>
@@ -159,20 +204,10 @@ function renderTable() {
   `).join('');
 }
 
-function nextStatus(current) {
+function nextStatus(cur) {
   const flow = ['draft', 'testing', 'ready', 'deprecated'];
-  const index = flow.indexOf(current);
-  if (index < 0) return 'draft';
-  return flow[(index + 1) % flow.length];
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+  const i = flow.indexOf(cur);
+  return i < 0 ? 'draft' : flow[(i + 1) % flow.length];
 }
 
 async function refresh() {
@@ -181,11 +216,71 @@ async function refresh() {
   renderTable();
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Exportación JSON
+   ═══════════════════════════════════════════════════════════════ */
+function exportJSON() {
+  const data = JSON.stringify(state.rows, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url, download: `nousui_components_${Date.now()}.json`,
+  });
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Archivo JSON exportado', 'info');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Dark mode
+   ═══════════════════════════════════════════════════════════════ */
+function initDarkMode() {
+  const saved = localStorage.getItem('nous_dark');
+  if (saved === 'true') document.body.classList.add('dark');
+  el.darkModeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('nous_dark', document.body.classList.contains('dark'));
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Theme
+   ═══════════════════════════════════════════════════════════════ */
+const DEFAULT_THEME = { accent: '#2a85ff', bg: '#f7f7f5', text: '#1e1e1e', panel: '#ffffff' };
+
+function bootTheme() {
+  const theme = { ...DEFAULT_THEME, ...loadTheme() };
+  applyTheme(theme);
+  el.accentInput.value = theme.accent || DEFAULT_THEME.accent;
+  el.bgInput.value     = theme.bg     || DEFAULT_THEME.bg;
+  el.textInput.value   = theme.text   || DEFAULT_THEME.text;
+  el.panelInput.value  = theme.panel  || DEFAULT_THEME.panel;
+}
+
+el.saveThemeBtn.addEventListener('click', () => {
+  applyTheme({
+    accent: el.accentInput.value,
+    bg:     el.bgInput.value,
+    text:   el.textInput.value,
+    panel:  el.panelInput.value,
+  });
+  showToast('Tema guardado', 'success');
+});
+
+el.resetThemeBtn.addEventListener('click', () => {
+  applyTheme(DEFAULT_THEME);
+  bootTheme();
+  showToast('Tema restaurado a defaults', 'info');
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   Event listeners
+   ═══════════════════════════════════════════════════════════════ */
 el.openModalBtn.addEventListener('click', () => el.componentModal.open());
+el.exportBtn.addEventListener('click', exportJSON);
 
-el.componentForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-
+el.componentForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
   const payload = {
     name: el.compName.value.trim(),
     type: el.compType.value,
@@ -193,12 +288,7 @@ el.componentForm.addEventListener('submit', async (event) => {
     notes: el.compNotes.value.trim(),
     createdAt: new Date().toISOString(),
   };
-
-  if (!payload.name) {
-    showToast('El nombre es obligatorio');
-    return;
-  }
-
+  if (!payload.name) { showToast('El nombre es obligatorio', 'warning'); return; }
   await insertRow(payload);
   el.componentForm.reset();
   el.componentModal.close();
@@ -206,29 +296,27 @@ el.componentForm.addEventListener('submit', async (event) => {
   showToast('Componente guardado en IndexedDB');
 });
 
-el.componentsTable.addEventListener('click', async (event) => {
-  const button = event.target.closest('button[data-action]');
-  if (!button) return;
+el.componentsTable.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  const row = e.target.closest('tr[data-id]');
+  if (!row) return;
+  const id = Number(row.dataset.id);
+  const item = state.rows.find(r => r.id === id);
+  if (!item) return;
 
-  const rowEl = event.target.closest('tr[data-id]');
-  if (!rowEl) return;
-
-  const id = Number(rowEl.dataset.id);
-  const current = state.rows.find((row) => row.id === id);
-  if (!current) return;
-
-  const action = button.dataset.action;
-
-  if (action === 'delete') {
+  if (btn.dataset.action === 'delete') {
+    const ok = await nousConfirm(`¿Eliminar "${item.name}"?`, 'Eliminar componente');
+    if (!ok) return;
     await deleteRow(id);
     await refresh();
-    showToast('Componente eliminado');
+    showToast('Componente eliminado', 'danger');
     return;
   }
 
-  if (action === 'promote') {
-    current.status = nextStatus(current.status);
-    await updateRow(current);
+  if (btn.dataset.action === 'promote') {
+    item.status = nextStatus(item.status);
+    await updateRow(item);
     await refresh();
     showToast('Estado actualizado');
   }
@@ -245,38 +333,30 @@ el.searchInput.addEventListener('input', () => {
 });
 
 el.resetDbBtn.addEventListener('click', async () => {
-  const ok = confirm('¿Seguro que quieres vaciar la base de datos local de componentes?');
+  const ok = await nousConfirm('¿Vaciar la base de datos local de componentes?', 'Reset BD');
   if (!ok) return;
   await clearStore();
   await refresh();
-  showToast('Base de datos local reiniciada');
+  showToast('Base de datos reiniciada', 'info');
 });
 
-el.saveThemeBtn.addEventListener('click', () => {
-  const current = loadTheme();
-  applyTheme({
-    ...current,
-    accent: el.accentInput.value,
-    bg: el.bgInput.value,
-  });
-  showToast('Tema guardado');
-});
+/* Demo buttons */
+el.demoModalBtn?.addEventListener('click', () => el.demoModal.open());
+el.demoToastBtn?.addEventListener('click', () => showToast('Toast de demostración 🎉', 'accent'));
 
-function bootTheme() {
-  const theme = loadTheme();
-  applyTheme(theme);
-  if (theme.accent) el.accentInput.value = theme.accent;
-  if (theme.bg) el.bgInput.value = theme.bg;
-}
-
+/* ═══════════════════════════════════════════════════════════════
+   Boot
+   ═══════════════════════════════════════════════════════════════ */
 async function init() {
-  bootTheme();
   initNousUI();
+  bootTheme();
+  initDarkMode();
+  initTabs();
   state.filterStatus = el.statusFilter.value;
   await refresh();
 }
 
-init().catch((error) => {
-  console.error(error);
-  showToast(`Error al iniciar: ${error.message}`);
+init().catch(err => {
+  console.error(err);
+  showToast(`Error al iniciar: ${err.message}`, 'danger');
 });

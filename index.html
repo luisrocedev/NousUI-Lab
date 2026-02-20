@@ -3,84 +3,195 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NousUI Lab — Librería de Web Components personalizada con demo CRUD, temas dinámicos e IndexedDB.">
   <title>NousUI Lab · Librería gráfica personalizada</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/styles.css">
+  <noscript><style>body::after{content:'Activa JavaScript para usar NousUI Lab.';display:block;padding:2rem;text-align:center;}</style></noscript>
 </head>
 <body>
   <main class="shell">
+    <!-- Header -->
     <section class="panel header">
-      <div>
+      <div class="header-left">
         <h1>NousUI Lab</h1>
-        <p>Librería personalizada de interfaces + demo funcional con persistencia en IndexedDB.</p>
+        <p>Librería personalizada de interfaces · 6 Web Components + demo funcional con IndexedDB.</p>
       </div>
-      <div class="actions">
-        <button id="openModalBtn">Nuevo componente</button>
-        <button id="resetDbBtn" class="secondary">Reset BD</button>
+      <div class="header-right">
+        <button id="darkModeBtn" class="icon-btn" title="Alternar modo oscuro">🌓</button>
       </div>
     </section>
 
-    <section class="panel">
-      <div class="row">
-        <label>Filtro por estado
-          <select id="statusFilter" data-nous="searchable">
-            <option value="all">Todos</option>
-            <option value="draft">Borrador</option>
-            <option value="testing">En pruebas</option>
-            <option value="ready">Listo</option>
-            <option value="deprecated">Deprecated</option>
-          </select>
-        </label>
-        <label>Búsqueda por nombre
-          <input id="searchInput" placeholder="Ej: Input con validación async">
-        </label>
-      </div>
-      <div class="stats" id="statsBox"></div>
-    </section>
+    <!-- Tabs -->
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="components" role="tab" aria-selected="true">Componentes</button>
+      <button class="tab" data-tab="badges" role="tab" aria-selected="false">Insignias</button>
+      <button class="tab" data-tab="theme" role="tab" aria-selected="false">Tema</button>
+    </nav>
 
-    <section class="panel">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Tipo</th>
-              <th>Estado</th>
-              <th>Notas</th>
-              <th>Creado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="componentsTable"></tbody>
-        </table>
-      </div>
-      <div id="emptyState" class="empty" hidden>No hay componentes todavía.</div>
-    </section>
+    <!-- ════ Tab: Componentes ════ -->
+    <div id="tab-components" class="tab-content active">
 
-    <section class="grid">
-      <nous-card>
-        <span slot="title">Playground de badges</span>
-        <p>Componente web personalizado de la librería.</p>
+      <!-- KPIs -->
+      <section class="kpi-bar" id="statsBox">
+        <div class="kpi kpi-total"><span id="kpiTotal">0</span>Total</div>
+        <div class="kpi kpi-ready"><span id="kpiReady">0</span>Listos</div>
+        <div class="kpi kpi-testing"><span id="kpiTesting">0</span>En pruebas</div>
+        <div class="kpi kpi-draft"><span id="kpiDraft">0</span>Borradores</div>
+      </section>
+
+      <!-- Filtros -->
+      <section class="panel">
+        <div class="row">
+          <label>Filtro por estado
+            <select id="statusFilter" data-nous="searchable">
+              <option value="all">Todos</option>
+              <option value="draft">Borrador</option>
+              <option value="testing">En pruebas</option>
+              <option value="ready">Listo</option>
+              <option value="deprecated">Deprecated</option>
+            </select>
+          </label>
+          <label>Búsqueda por nombre
+            <input id="searchInput" placeholder="Ej: Input con validación async">
+          </label>
+        </div>
         <div class="actions">
+          <button id="openModalBtn">+ Nuevo</button>
+          <button id="exportBtn" class="secondary">Exportar JSON</button>
+          <button id="resetDbBtn" class="secondary">Reset BD</button>
+        </div>
+      </section>
+
+      <!-- Tabla -->
+      <section class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Notas</th>
+                <th scope="col">Creado</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="componentsTable"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty" hidden>No hay componentes todavía.</div>
+      </section>
+
+      <!-- Preview Grid -->
+      <h2>Catálogo de componentes</h2>
+      <section class="preview-grid">
+        <nous-card accent="#2a85ff">
+          <span slot="title">Card</span>
+          <p>Tarjeta con barra de acento, hover y slot de contenido.</p>
+        </nous-card>
+
+        <nous-card>
+          <span slot="title">Badge</span>
+          <div class="badge-demo">
+            <nous-badge tone="success">success</nous-badge>
+            <nous-badge tone="info">info</nous-badge>
+            <nous-badge tone="accent">accent</nous-badge>
+          </div>
+        </nous-card>
+
+        <nous-card>
+          <span slot="title">Modal</span>
+          <button id="demoModalBtn" class="secondary">Abrir modal demo</button>
+        </nous-card>
+
+        <nous-card>
+          <span slot="title">Toast</span>
+          <button id="demoToastBtn" class="secondary">Lanzar toast</button>
+        </nous-card>
+
+        <nous-card>
+          <span slot="title">Progress</span>
+          <nous-progress value="73" tone="accent"></nous-progress>
+        </nous-card>
+
+        <nous-card>
+          <span slot="title">Tooltip</span>
+          <nous-tooltip text="Información del componente">
+            <button class="secondary">Hover aquí</button>
+          </nous-tooltip>
+        </nous-card>
+      </section>
+    </div>
+
+    <!-- ════ Tab: Insignias ════ -->
+    <div id="tab-badges" class="tab-content">
+      <section class="panel">
+        <h2>Catálogo de tonos · <code>&lt;nous-badge&gt;</code></h2>
+        <p>6 variantes cromáticas con punto indicador automático.</p>
+        <div class="badge-catalog">
           <nous-badge tone="neutral">neutral</nous-badge>
           <nous-badge tone="success">success</nous-badge>
           <nous-badge tone="warning">warning</nous-badge>
           <nous-badge tone="danger">danger</nous-badge>
+          <nous-badge tone="info">info</nous-badge>
+          <nous-badge tone="accent">accent</nous-badge>
         </div>
-      </nous-card>
 
-      <nous-card>
-        <span slot="title">Tema de la librería</span>
-        <label>Color de acento
-          <input id="accentInput" type="color" value="#2f3437">
-        </label>
-        <label>Color de fondo
-          <input id="bgInput" type="color" value="#f6f6f4">
-        </label>
-        <button id="saveThemeBtn" class="secondary">Guardar tema</button>
-      </nous-card>
-    </section>
+        <h3>Uso en HTML</h3>
+        <pre><code>&lt;nous-badge tone="success"&gt;Listo&lt;/nous-badge&gt;</code></pre>
+
+        <h3>Barra de progreso · <code>&lt;nous-progress&gt;</code></h3>
+        <div class="progress-demos">
+          <nous-progress value="25" tone="danger"></nous-progress>
+          <nous-progress value="55" tone="warning"></nous-progress>
+          <nous-progress value="85" tone="success"></nous-progress>
+          <nous-progress value="100" tone="accent"></nous-progress>
+        </div>
+
+        <h3>Tooltip · <code>&lt;nous-tooltip&gt;</code></h3>
+        <div class="badge-catalog">
+          <nous-tooltip text="Tooltip con flecha CSS">
+            <button class="secondary">Pasa el ratón</button>
+          </nous-tooltip>
+          <nous-tooltip text="Shadow DOM encapsulado">
+            <nous-badge tone="info">Hover me</nous-badge>
+          </nous-tooltip>
+        </div>
+      </section>
+    </div>
+
+    <!-- ════ Tab: Tema ════ -->
+    <div id="tab-theme" class="tab-content">
+      <section class="panel">
+        <h2>Editor de tema</h2>
+        <p>Personaliza los colores de la interfaz. Se persisten en <code>localStorage</code>.</p>
+        <div class="theme-grid">
+          <label>Color de acento
+            <input id="accentInput" type="color" value="#2a85ff">
+          </label>
+          <label>Color de fondo
+            <input id="bgInput" type="color" value="#f7f7f5">
+          </label>
+          <label>Color de texto
+            <input id="textInput" type="color" value="#1e1e1e">
+          </label>
+          <label>Color de panel
+            <input id="panelInput" type="color" value="#ffffff">
+          </label>
+        </div>
+        <div class="actions">
+          <button id="saveThemeBtn">Guardar tema</button>
+          <button id="resetThemeBtn" class="secondary">Resetear a defaults</button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">NousUI Lab · Librería de Web Components · DAM2 2025/26</footer>
   </main>
 
+  <!-- Modal para nuevo componente -->
   <nous-modal id="componentModal">
     <span slot="title">Nuevo componente de interfaz</span>
     <form id="componentForm">
@@ -113,6 +224,25 @@
       </div>
     </form>
   </nous-modal>
+
+  <!-- Modal demo -->
+  <nous-modal id="demoModal">
+    <span slot="title">Modal de demostración</span>
+    <p>Este es un diálogo modal con <strong>backdrop blur</strong>, cierre por <kbd>ESC</kbd> y animación <code>slideUp</code>.</p>
+    <nous-progress value="60" tone="accent"></nous-progress>
+  </nous-modal>
+
+  <!-- Confirm overlay -->
+  <div class="confirm-overlay" id="confirmOverlay" hidden>
+    <div class="confirm-box">
+      <h3 id="confirmTitle">Confirmación</h3>
+      <p id="confirmMsg"></p>
+      <div class="actions">
+        <button id="confirmNo" class="secondary">Cancelar</button>
+        <button id="confirmYes">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
   <nous-toast id="toast"></nous-toast>
 
